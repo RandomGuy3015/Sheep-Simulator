@@ -24,6 +24,8 @@ namespace Test
         private Pathfinder _pathFinder;
         private InputManager _inputManager;
         private Camera _camera;
+        public  SoundManager SoundManager;
+
         private Sheep mSheep;
         private Vector2 _size;
         private int _gridSquareSize;
@@ -58,6 +60,8 @@ namespace Test
             _waveFunctionCollapse = new (_WFCGrid, _WFCGrid.IsPathable, () => new Point((int)_size.X, (int)_size.Y), _WFCGrid.GetNode, _WFCGrid.SetNode);
 
             _camera = new(_graphics, _inputManager);
+
+            SoundManager = new SoundManager();
             base.Initialize();
 
             for (int i = 0; i < _noiseMap.WoodGrid.Count(); i++)
@@ -122,6 +126,8 @@ namespace Test
             List<string> everythingEverywhereAllAtOnce = ContentList();
 
             ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
+            
+            mSheep = new Sheep(new Vector2(0, 0), "sheep.png", 0.05f, 0.2f, 500);
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -130,9 +136,9 @@ namespace Test
 
         protected override void Update(GameTime gameTime)
         {
+            mSheep.Update(gameTime);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
 
             var inputState = _inputManager.Update();
 
@@ -146,22 +152,26 @@ namespace Test
 
         protected override void Draw(GameTime gameTime)
         {
-
             GraphicsDevice.SetRenderTarget(_renderTarget);
             GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
             GraphicsDevice.Clear(Color.Transparent);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+
+
             _grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
+
 
             _grid.DrawGrid(_spriteBatch);
 
             //_waveFunctionCollapse.Draw(_spriteBatch);
             //_waveFunctionCollapse.Collapse();
 
+            mSheep.Draw(_spriteBatch);
             _spriteBatch.End();
 
-            
+
+            // other
             GraphicsDevice.SetRenderTarget(null);
             
             _spriteBatch.Begin();
@@ -183,7 +193,7 @@ namespace Test
         {
             List<string> contentStringList = new List<string>
             {
-                
+                "sheep.png"
             };
 
             return contentStringList;

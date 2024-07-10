@@ -18,6 +18,7 @@ namespace Test
         public Vector2 Position { get; set; }
         public Vector2 PositionNew { get; set; }
         public Vector2 PositionAfterCollision { get; set; }
+        
 
 
         public float Speed { get; set; }
@@ -40,15 +41,26 @@ namespace Test
 
         private Vector2 mDestination;
         private Vector2 mCenter;
+        private float mScale;
+        private int mRange;
+
+        // time
+        DateTime startTime;
 
 
-        public Sheep(Vector2 position, string textureName)
+        public Sheep(Vector2 position, string textureName, float speed, float scale, int range)
 		{
             Position = position;
             Asset = textureName;
             mCenter = new Vector2((ContentDictionary.TextureDict[Asset].Width / 2), (ContentDictionary.TextureDict[Asset].Height / 2));
-            
-		}
+            Direction = new Vector2(0, 0);
+            startTime = DateTime.Now;
+            Speed = 0.1f;
+            mScale = scale;
+            mRange = range;
+            SetDestination(mRange);
+
+        }
         public Vector2 Center()
         {
             return mCenter;
@@ -62,25 +74,27 @@ namespace Test
         public void SetDestination(int range) {
             Random random = new Random();
             mDestination = new Vector2(random.Next(-range, range), random.Next(-range, range));
+            Direction = mDestination - Position;
+            Direction.Normalize();
         }
 
         public void MoveStep(bool sprinting)
         {
-            Direction = Position - Direction;
-            Direction.Normalize();
-
-            Position += Direction;
+            Position += (Direction / 10) * Speed;
         }
 
         public void Behaviour(GameTime gameTime)
         {
-            if ((Position - mDestination).Length() > 1)
+            // sheep trys to get as close as possible to the Destination
+            if ((mDestination - Position).Length() > 1)
             {
                 MoveStep(false);
             }
-            else
+            else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
             {
-                SetDestination(100);
+                startTime = DateTime.Now;
+                SetDestination(mRange);
+
             }
         }
 
@@ -88,14 +102,18 @@ namespace Test
 
         public void Update(GameTime gameTime)
         {
+
             Behaviour(gameTime);
+            //Game1.SoundManager.PlaySfx("sheep.wav");
+            
         }
 
         public void Animate(GameTime gameTime) { }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White, (float)Math.Atan2(Direction.Y, Direction.X), mCenter, 1, SpriteEffects.None, 0);
+            // (float)Math.Atan2(Direction.Y, Direction.X) -> projectiles
+            spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White,0, mCenter, mScale / 3, SpriteEffects.None, 0);
 
         }
     }
