@@ -17,7 +17,7 @@ public interface IMovable : IGameObject
     public List<Vector2> Path { get; set; }
     void Animate(GameTime gameTime);
     void MoveStep(bool sprinting);
-    void SetDestination(Vector2 destination);
+    void SetDestination(int range);
     Vector2 Center();
     Vector2 Destination();
 }

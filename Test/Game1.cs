@@ -24,7 +24,7 @@ namespace Test
         private Pathfinder _pathFinder;
         private InputManager _inputManager;
         private Camera _camera;
-
+        private Sheep mSheep;
         private Vector2 _size;
         private int _gridSquareSize;
 
@@ -119,6 +119,10 @@ namespace Test
 
         protected override void LoadContent()
         {
+            List<string> everythingEverywhereAllAtOnce = ContentList();
+
+            ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
@@ -173,6 +177,16 @@ namespace Test
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        private List<string> ContentList()
+        {
+            List<string> contentStringList = new List<string>
+            {
+                
+            };
+
+            return contentStringList;
         }
 
     }
