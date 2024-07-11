@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
-using Test.DynamicContentManagement;
+
 
 
 
@@ -93,6 +93,7 @@ namespace Test
             else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
             {
                 startTime = DateTime.Now;
+                Game1.SoundManager.PlaySfx("sheepSound.wav");
                 SetDestination(mRange);
 
             }
@@ -104,7 +105,7 @@ namespace Test
         {
 
             Behaviour(gameTime);
-            //Game1.SoundManager.PlaySfx("sheep.wav");
+            
             
         }
 

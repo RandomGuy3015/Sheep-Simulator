@@ -24,9 +24,11 @@ namespace Test
         private Pathfinder _pathFinder;
         private InputManager _inputManager;
         private Camera _camera;
-        public  SoundManager SoundManager;
+
+        public  static SoundManager SoundManager;
 
         private Sheep mSheep;
+        private Sheep mShaun;
         private Vector2 _size;
         private int _gridSquareSize;
 
@@ -128,6 +130,7 @@ namespace Test
             ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
             
             mSheep = new Sheep(new Vector2(0, 0), "sheep.png", 0.05f, 0.2f, 500);
+            mShaun = new Sheep(new Vector2(500, 500), "shaun.png", 0.05f, 0.45f, 500);
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -137,6 +140,7 @@ namespace Test
         protected override void Update(GameTime gameTime)
         {
             mSheep.Update(gameTime);
+            mShaun.Update(gameTime);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -168,6 +172,7 @@ namespace Test
             //_waveFunctionCollapse.Collapse();
 
             mSheep.Draw(_spriteBatch);
+            mShaun.Draw(_spriteBatch);
             _spriteBatch.End();
 
 
@@ -193,7 +198,12 @@ namespace Test
         {
             List<string> contentStringList = new List<string>
             {
-                "sheep.png"
+                // pictures
+                "sheep.png",
+                "shaun.png",
+
+                // sounds
+                "sheepSound.wav"
             };
 
             return contentStringList;
