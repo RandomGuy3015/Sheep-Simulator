@@ -95,7 +95,8 @@ namespace Test
                 startTime = DateTime.Now;
                 Game1.SoundManager.PlaySfx("sheepSound.wav");
                 SetDestination(mRange);
-
+                Game1.PoopDict[Game1.poopCount] = new Poop(Game1.poopCount, Position);
+                Game1.poopCount++;
             }
         }
 

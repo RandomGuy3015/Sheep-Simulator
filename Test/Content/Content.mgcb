@@ -115,6 +115,24 @@
 /processorParam:Quality=Best
 /build:sheepSound.wav
 
+#begin fart.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:fart.wav
+
+#begin poop.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:poop.png
+
 #begin void.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -126,5 +144,7 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:void.png
+
+
 
 

@@ -29,6 +29,9 @@ namespace Test
 
         private Sheep mSheep;
         private Sheep mShaun;
+        public static Dictionary<int, Poop> PoopDict;
+        public static int poopCount;
+
         private Vector2 _size;
         private int _gridSquareSize;
 
@@ -131,6 +134,8 @@ namespace Test
             
             mSheep = new Sheep(new Vector2(0, 0), "sheep.png", 0.05f, 0.2f, 500);
             mShaun = new Sheep(new Vector2(500, 500), "shaun.png", 0.05f, 0.45f, 500);
+            PoopDict = new Dictionary<int, Poop>();
+            poopCount = 0;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -141,6 +146,13 @@ namespace Test
         {
             mSheep.Update(gameTime);
             mShaun.Update(gameTime);
+            
+            // IMPORTANT POOP UPDATE
+            foreach (Poop poop in PoopDict.Values)
+            {
+                poop.Update(gameTime);
+            }
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -173,6 +185,13 @@ namespace Test
 
             mSheep.Draw(_spriteBatch);
             mShaun.Draw(_spriteBatch);
+            
+            // IMPORTANT POOP DRAW
+            foreach (Poop poop in PoopDict.Values)
+            {
+                poop.Draw(_spriteBatch);
+            }
+
             _spriteBatch.End();
 
 
@@ -201,9 +220,11 @@ namespace Test
                 // pictures
                 "sheep.png",
                 "shaun.png",
+                "poop.png",
 
                 // sounds
-                "sheepSound.wav"
+                "sheepSound.wav",
+                "fart.wav"
             };
 
             return contentStringList;
