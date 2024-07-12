@@ -10,7 +10,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Test
 {
-    public class Poop: ICollidable
+    /// <summary>
+    /// Can be used to create an Item, which can disappear after some time
+    /// </summary>
+    public class Item: ICollidable
     {
         public Vector2 Position { get; set; }
         public int ObjectId { get; set; }
@@ -28,33 +31,122 @@ namespace Test
         public int CollisionPriority { get; set; }
         public Rectangle RectangleNew { get; }
 
-        
 
-        protected Texture2D mTexture;
-        private Vector2 mCenter;
-        private float mScale;
+        protected Vector2 mCenter;
+        protected float mScale;
+        protected string mSound;
 
         protected float mTransparency;
         protected int mTimer;
-        public Poop(int objectid, Vector2 position, bool despawn=true)
+
+        public Item(int objectid, Vector2 position, string asset, string sound = "", bool despawn = true)
         {
             ObjectId = objectid;
             Random random = new Random();
 
             if (random.Next(0, 5) == 1)
             {
-                //MainGame.mObjectManager.mSceneGraphGold.Remove(ObjectId);
+                Game1.ItemDict.Remove(ObjectId);
                 return;
             }
 
-
-            int randomInt = Math.Clamp((int) Math.Pow(Gold * 1.25f, 1f / 2.9f) - 2, 1, 6);
-            Asset = "poop.png";
+            Asset = asset;
+            mSound = sound;
             mCenter = new Vector2(ContentDictionary.TextureDict[Asset].Width / 2, ContentDictionary.TextureDict[Asset].Height / 2);
             mScale = 0.1f;
 
-            int iteration = 0;
-            int distance = 8;
+
+            mTransparency = 1;
+            if (despawn)
+            {
+                mTimer = 600;
+            }
+            else
+            {
+                mTimer = -1;
+            }
+
+            Position = position;
+
+
+            int randomDirection = random.Next(0, 8);
+            Vector2 newPosition = Position;
+
+            if (sound != "")
+            {
+                Game1.SoundManager.PlaySfx(mSound);
+            }
+
+            Rectangle = new Rectangle((int) Position.X, (int)Position.Y , ContentDictionary.TextureDict[Asset].Width, ContentDictionary.TextureDict[Asset].Height);
+        }
+
+
+        public virtual void OnCollision(ICollidable collidingWith)
+        {
+
+        }
+
+        public virtual void Update(GameTime gameTime)
+        {
+
+            if (mTimer > 0)
+            {
+                mTimer--;
+            }
+
+
+            if (mTimer == 0)
+            {
+                Game1.ItemDict.Remove(ObjectId);
+            }
+        }
+
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+            // behaviour of almost dead gold...
+            if (mTimer < 130 && mTimer % 30 == 0)
+            {
+                mTransparency = 0.2f;
+            }
+            else if (mTimer < 130 && mTimer % 15 == 0)
+
+            {
+                mTransparency = 1;
+            }
+
+            if (mTimer < 590)
+            {
+                spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White * mTransparency, 0, mCenter, mScale, SpriteEffects.None, 0);
+            }
+        }
+
+    }
+
+
+    public class Poop: Item, ICollidable
+    {
+
+        public Poop(int objectid, Vector2 position, bool despawn = true) : base(objectid, position, "poop.png", "fart.wav")
+        {
+            ObjectId = objectid;
+            Random random = new Random();
+
+            // sometimes poop disappears directly
+            if (random.Next(0, 5) == 1)
+            {
+                Game1.ItemDict.Remove(ObjectId);
+                return;
+            }
+            
+            Asset = "poop.png";
+            mSound = "fart.wav";
+            
+            int randomInt = Math.Clamp((int) Math.Pow(Gold * 1.25f, 1f / 2.9f) - 2, 1, 6);
+            
+            mCenter = new Vector2(ContentDictionary.TextureDict[Asset].Width / 2, ContentDictionary.TextureDict[Asset].Height / 2);
+            mScale = 0.1f;
+
+            
 
             mTransparency = 1;
             if (despawn)
@@ -72,50 +164,9 @@ namespace Test
             int randomDirection = random.Next(0, 8);
             Vector2 newPosition = Position;
            
-
-            Game1.SoundManager.PlaySfx("fart.wav");
+            // sound
+            Game1.SoundManager.PlaySfx(mSound);
             
-            // Rectangle = new Rectangle((int) Position.X, (int)Position.Y , mTexture.Width, mTexture.Height);
-        }
-
-
-        public virtual void OnCollision(ICollidable collidingWith)
-        { 
-            
-        }
-
-        public virtual void Update(GameTime gameTime)
-        {
-            
-            if (mTimer > 0)
-            { 
-                mTimer--;
-            }
-          
-            
-            if (mTimer == 0)
-            {
-                Game1.PoopDict.Remove(ObjectId);
-            }
-        }
-
-        public virtual void Draw(SpriteBatch spriteBatch)
-        {
-            // behaviour of almost dead gold...
-            if (mTimer < 130 && mTimer % 30 == 0)
-            {
-                mTransparency = 0.2f;
-            }
-            else if(mTimer < 130 && mTimer % 15 == 0)
-
-            {
-                mTransparency = 1;
-            }
-
-            if (mTimer < 590)
-            {
-                spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White * mTransparency, 0, mCenter, mScale, SpriteEffects.None, 0);
-            }
         }
 
     }

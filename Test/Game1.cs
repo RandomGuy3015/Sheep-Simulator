@@ -29,8 +29,8 @@ namespace Test
 
         private Sheep mSheep;
         private Sheep mShaun;
-        public static Dictionary<int, Poop> PoopDict;
-        public static int poopCount;
+        public static Dictionary<int, Item> ItemDict;
+        public static int ItemCount;
 
         private Vector2 _size;
         private int _gridSquareSize;
@@ -132,10 +132,10 @@ namespace Test
 
             ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
             
-            mSheep = new Sheep(new Vector2(0, 0), "sheep.png", 0.05f, 0.2f, 500);
-            mShaun = new Sheep(new Vector2(500, 500), "shaun.png", 0.05f, 0.45f, 500);
-            PoopDict = new Dictionary<int, Poop>();
-            poopCount = 0;
+            mSheep = new Sheep(new Vector2(1000, 1000), "sheep.png", 0.05f, 0.2f, 500);
+            mShaun = new Sheep(new Vector2(1000, 1000), "shaun.png", 0.05f, 0.45f, 500);
+            ItemDict = new Dictionary<int, Item>();
+            ItemCount = 0;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -148,9 +148,9 @@ namespace Test
             mShaun.Update(gameTime);
             
             // IMPORTANT POOP UPDATE
-            foreach (Poop poop in PoopDict.Values)
+            foreach (Item item in ItemDict.Values)
             {
-                poop.Update(gameTime);
+                item.Update(gameTime);
             }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -187,9 +187,9 @@ namespace Test
             mShaun.Draw(_spriteBatch);
             
             // IMPORTANT POOP DRAW
-            foreach (Poop poop in PoopDict.Values)
+            foreach (Item item in ItemDict.Values)
             {
-                poop.Draw(_spriteBatch);
+                item.Draw(_spriteBatch);
             }
 
             _spriteBatch.End();
@@ -221,6 +221,7 @@ namespace Test
                 "sheep.png",
                 "shaun.png",
                 "poop.png",
+                "dot.png",
 
                 // sounds
                 "sheepSound.wav",

@@ -89,14 +89,17 @@ namespace Test
             if ((mDestination - Position).Length() > 1)
             {
                 MoveStep(false);
+                Game1.ItemDict[Game1.ItemCount] = new Item(Game1.ItemCount, Position, "dot.png");
+                Game1.ItemCount++;
+
             }
             else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
             {
                 startTime = DateTime.Now;
                 Game1.SoundManager.PlaySfx("sheepSound.wav");
                 SetDestination(mRange);
-                Game1.PoopDict[Game1.poopCount] = new Poop(Game1.poopCount, Position);
-                Game1.poopCount++;
+                Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
+                Game1.ItemCount++;
             }
         }
 
