@@ -8,8 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Test
 {
-	public class Sheep: IMovable, ICollidable, IActive
-	{
+    public class Sheep : IMovable, ICollidable, IActive
+    {
         // Location
         public int ObjectId { get; set; }
         public Vector2 Direction { get; set; }
@@ -18,7 +18,7 @@ namespace Test
         public Vector2 Position { get; set; }
         public Vector2 PositionNew { get; set; }
         public Vector2 PositionAfterCollision { get; set; }
-        
+
 
         public float Speed { get; set; }
         public float SpeedSprint { get; set; }
@@ -30,7 +30,7 @@ namespace Test
 
         public string Asset { get; set; }
         public int Energy { get; set; }
-        public int Reproduction { get; set; }
+        public int mReproduction { get; set; }
         public int Age { get; set; }
 
 
@@ -49,19 +49,20 @@ namespace Test
         DateTime startTime;
 
 
-        public Sheep(Vector2 position, string textureName,int objectId, float speed, float scale, int range)
-		{
+        public Sheep(Vector2 position, string textureName, int objectId, float speed, float scale, int range)
+        {
             Position = position;
             Asset = textureName;
             ObjectId = objectId;
             mCenter = new Vector2((ContentDictionary.TextureDict[Asset].Width / 2), (ContentDictionary.TextureDict[Asset].Height / 2));
             Direction = new Vector2(0, 0);
             startTime = DateTime.Now;
-            Speed = 0.1f;
-            mScale = scale;
+            Speed = speed;
+            mScale = scale / 3;
             mRange = range;
-            SetDestination(mRange);
-            Reproduction = 0;
+            SetDestination(mRange, true);
+            mReproduction = 0;
+            Rectangle = new Rectangle(ContentDictionary.TextureDict[Asset].Width, ContentDictionary.TextureDict[Asset].Height, (int)mCenter.X, (int)mCenter.Y);
 
         }
         public Vector2 Center()
@@ -74,16 +75,26 @@ namespace Test
             return mDestination;
         }
 
-        public void SetDestination(int range) {
-            Random random = new Random();
-            mDestination = new Vector2(random.Next(-range, range), random.Next(-range, range));
+        public void SetDestination(int range, bool randomDestination)
+        {
+            if (randomDestination)
+            { 
+                Random random = new Random();
+                mDestination = new Vector2(random.Next(0, range), random.Next(0, range));
+            }
+
             Direction = mDestination - Position;
-            Direction.Normalize();
+
+            while (Direction.Length() > 2)
+            {
+                Direction = Direction / 2;
+            }
+            //Direction.Normalize();
         }
 
         public void MoveStep(bool sprinting)
         {
-            Position += (Direction / 10) * Speed;
+            Position += Direction * Speed;
         }
 
         public void Behaviour(GameTime gameTime)
@@ -97,26 +108,65 @@ namespace Test
             {
                 startTime = DateTime.Now;
                 Game1.SoundManager.PlaySfxChecked("sheepSound.wav");
-                SetDestination(mRange);
-                Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
-                Game1.ItemCount++;
-                Reproduction++;
+                SetDestination(mRange, true);
+
+                Random random = new Random();
+
+                if (random.Next(0, 20) == 5)
+                {
+                    Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
+                    Game1.ItemCount++;
+                }
+                mReproduction++;
             }
-            if (Reproduction >= 1)
+            if (mReproduction >= 5)
             {
-                Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, 0.05f, 0.2f, mRange);
-                Game1.SheepCount++;
-                Reproduction = 0;
+                LookForLove();
+
+                mReproduction = 0;
             }
-            
+
         }
 
-        public void OnCollision(ICollidable collidingWith) { }
+        public void LookForLove()
+        {
+            foreach (Sheep sheep in Game1.SheepDict.Values)
+            {
+                if (sheep.Position != Position)
+                {
+                    mDestination = sheep.Position;
+                    SetDestination(100, false);
+                    sheep.mReproduction = 5;
+                    sheep.Speed = 0;
+                }
+            }
+        }
+
+        public void Reproduction()
+        {
+            Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, Speed, 0.2f, mRange);
+            Game1.SheepCount++;
+        }
+
+        public void OnCollision(ICollidable collidingWith)
+        {
+            Game1.SheepDict.Remove(collidingWith.ObjectId);
+        }
 
         public void Update(GameTime gameTime)
         {
 
             Behaviour(gameTime);
+
+            /*
+            foreach (Sheep sheep in Game1.SheepDict.Values)
+            {
+                if (Rectangle.Intersects(sheep.Rectangle))
+                {
+                    OnCollision(sheep);
+                }
+
+            }*/
          
         }
 
@@ -125,7 +175,7 @@ namespace Test
         public void Draw(SpriteBatch spriteBatch)
         {
             // (float)Math.Atan2(Direction.Y, Direction.X) -> projectiles
-            spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White,0, mCenter, mScale / 3, SpriteEffects.None, 0);
+            spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White,0, mCenter, mScale, SpriteEffects.None, 0);
             
         }
     }

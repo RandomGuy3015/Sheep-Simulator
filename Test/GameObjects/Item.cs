@@ -31,7 +31,7 @@ namespace Test
         public int CollisionPriority { get; set; }
         public Rectangle RectangleNew { get; }
         public int Energy { get; set; }
-        public int Reproduction { get; set; }
+        public int mReproduction { get; set; }
         public int Age { get; set; }
 
         protected Vector2 mCenter;

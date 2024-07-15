@@ -13,7 +13,7 @@ public interface ICollidable : IGameObject
     public int StandingOn { get; set; }
     public List<int> StandingOver { get; set; }
     public int Energy { get; set; }
-    public int Reproduction { get; set; }
+    public int mReproduction { get; set; }
     public int Age { get; set; }
     public Vector2 PositionNew { get; set; }
     public Vector2 PositionAfterCollision { get; set; }

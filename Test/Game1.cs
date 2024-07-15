@@ -134,9 +134,6 @@ namespace Test
             List<string> everythingEverywhereAllAtOnce = ContentList();
 
             ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
-            
-            mSheep = new Sheep(new Vector2(1000, 1000), "sheep.png",0, 0.05f, 0.2f, 1000);
-            mShaun = new Sheep(new Vector2(1000, 1000), "shaun.png",1, 0.05f, 0.45f,1000);
             ItemDict = new Dictionary<int, Item>();
             SheepDict = new Dictionary<int, Sheep>();
             SheepQueue = new Dictionary<int, Sheep>();
@@ -145,13 +142,15 @@ namespace Test
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, 0.2f, 2000);
+            SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, 0.45f, 2000);
+
+
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
-            mSheep.Update(gameTime);
-            mShaun.Update(gameTime);
             
             // IMPORTANT POOP UPDATE
             foreach (Item item in ItemDict.Values)
@@ -200,9 +199,7 @@ namespace Test
             _waveFunctionCollapse.Draw(_spriteBatch);
             //_waveFunctionCollapse.Collapse();
 
-            mSheep.Draw(_spriteBatch);
-            mShaun.Draw(_spriteBatch);
-            
+          
             // IMPORTANT POOP DRAW
             foreach (Item item in ItemDict.Values)
             {
