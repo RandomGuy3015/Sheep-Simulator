@@ -404,7 +404,7 @@ namespace Test
                     if (self.GetSocket(i) != 0) { score = -10; }
                 }
 
-                if (score == bestScore && (other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 4) > 0) { score += 1; }
+                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 4) > 0) { score += 1; }
 
                 if (_random.Next(0, 2) == 0)
                 {

@@ -191,10 +191,10 @@ namespace Test
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
 
 
-            _grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
+            //_grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
 
 
-            _grid.DrawGrid(_spriteBatch);
+            //_grid.DrawGrid(_spriteBatch);
 
             _waveFunctionCollapse.Draw(_spriteBatch);
             //_waveFunctionCollapse.Collapse();
