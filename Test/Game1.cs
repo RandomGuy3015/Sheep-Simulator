@@ -247,6 +247,12 @@ namespace Test
                 "fart.wav"
             };
 
+            // WFC Tiles
+            foreach (string tile in _waveFunctionCollapse.TextureExporter())
+            {
+                contentStringList.Add(tile + ".png");
+            }
+
             return contentStringList;
         }
 

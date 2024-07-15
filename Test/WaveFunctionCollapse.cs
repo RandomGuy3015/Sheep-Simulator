@@ -139,6 +139,7 @@ namespace Test
         public WFCNode(bool WFCNodeType)
         {
             _WFCNodeType = WFCNodeType;
+            Name = "uncollapsed";
         }
 
         public WFCNode(int left, int topLeft, int top, int topRight, int right, int bottomRight, int bottom, int bottomLeft, string name)
@@ -397,12 +398,13 @@ namespace Test
             {
                 int score = -1;
 
-
                 for (int i = 0; i < 8; i++)
                 {
                     if (self.GetSocket(i) == other.GetSocket(i)) { score++; continue; }
                     if (self.GetSocket(i) != 0) { score = -10; }
                 }
+
+                if (score == bestScore && (other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 4) > 0) { score += 1; }
 
                 if (_random.Next(0, 2) == 0)
                 {
@@ -450,7 +452,15 @@ namespace Test
         {
             foreach (Point point in Looper())
             {
-                //spriteBatch.Draw(null, new Rectangle(point.X * 10, point.Y * 10, 10, 10), Color.White);
+                spriteBatch.Draw(ContentDictionary.TextureDict[_indexer(point).Name + ".png"], new Rectangle(point.X * 20, point.Y * 20, 20, 20), Color.White);
+            }
+        }
+
+        public IEnumerable<string> TextureExporter()
+        {
+            foreach (WFCNode node in WFCNodes.nodes)
+            {
+                yield return node.Name;
             }
         }
 
