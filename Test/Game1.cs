@@ -197,7 +197,7 @@ namespace Test
 
             _grid.DrawGrid(_spriteBatch);
 
-            //_waveFunctionCollapse.Draw(_spriteBatch);
+            _waveFunctionCollapse.Draw(_spriteBatch);
             //_waveFunctionCollapse.Collapse();
 
             mSheep.Draw(_spriteBatch);

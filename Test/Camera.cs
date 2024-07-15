@@ -73,7 +73,7 @@ public class Camera
         mZoom *= 1 + (0.0005f * mInputManager.GetMouseScroll());
 
         // limit zoom to certain values
-        mZoom = MathHelper.Clamp(mZoom, 0.5f, 6f);
+        mZoom = MathHelper.Clamp(mZoom, 0.5f, 16f);
 
         mSpeed = 10 / mZoom;
 

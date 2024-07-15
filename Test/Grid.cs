@@ -373,12 +373,15 @@ namespace Test
 
         public WFCNode GetNode(Point point)
         {
+            if (point.X < 0 ||  point.Y < 0 || point.X > mSlotCount.X - 1 || point.Y > mSlotCount.Y- 1) return null;
             return mSlots[point.Y][point.X].Node;
         }
 
-        public bool SetNode(Point point, WFCNode node)
+        public bool SetNode(Point point, WFCNode node, bool filled)
         {
+            if (point.X < 0 || point.Y < 0 || point.X > mSlotCount.X - 1 || point.Y > mSlotCount.Y - 1) return false;
             mSlots[point.Y][point.X].Node = node;
+            mSlots[point.Y][point.X].SetPathable(filled);
             return true;
         }
 
@@ -415,18 +418,18 @@ namespace Test
 
         public bool IsPathable(Vector2 pos)
         {
-            return !mSlots[(int)pos.Y][(int)pos.X].IsFilled;
+            return mSlots[(int)pos.Y][(int)pos.X].IsPathable;
         }
         public bool IsPathable(int key)
         {
-            return !mSlots[key / (int)mSlotCount.X][key % (int)mSlotCount.X].IsFilled;
+            return mSlots[key / (int)mSlotCount.X][key % (int)mSlotCount.X].IsPathable;
         }
 
         public bool IsPathable(Point pos)
         {
             if (pos.X < 0 || pos.Y < 0) return false;
             if (pos.X >= mSlotCount.X || pos.Y >= mSlotCount.Y) return false;
-            return mSlots[pos.Y][pos.X].IsFilled;
+            return mSlots[pos.Y][pos.X].IsPathable;
         }
 
         public void SetPathable(Point point, bool set)

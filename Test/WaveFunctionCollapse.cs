@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Test.Helper_classes;
 using System.Linq;
 using Test.InputMangement;
+using System.Text.RegularExpressions;
 
 namespace Test
 {
@@ -122,7 +123,9 @@ namespace Test
             return (int)(_socketData & 0b_1111_0000_0000_0000_0000_0000_0000_0000);
         }
         */
-        private bool _WFCNodeType;
+        private readonly bool _WFCNodeType;
+
+        public string Name { get; private set; }
 
         public int Left { get; private set; }
         public int TopLeft { get; private set; }
@@ -138,7 +141,7 @@ namespace Test
             _WFCNodeType = WFCNodeType;
         }
 
-        public WFCNode(int left, int topLeft, int top, int topRight, int right, int bottomRight, int bottom, int bottomLeft)
+        public WFCNode(int left, int topLeft, int top, int topRight, int right, int bottomRight, int bottom, int bottomLeft, string name)
         {
             _WFCNodeType = true;
 
@@ -150,6 +153,7 @@ namespace Test
             Bottom = bottom;
             BottomLeft = bottomLeft;
             BottomRight = bottomRight;
+            Name = name;
         }
 
 
@@ -163,7 +167,32 @@ namespace Test
             else if (direction == 5 && BottomRight == 0) { BottomRight = value; }
             else if (direction == 6 && Bottom == 0) { Bottom = value; }
             else if (direction == 7 && BottomLeft == 0) { BottomLeft = value; }
-            else { throw new Exception("Error"); }
+            //else { throw new Exception("Error"); }
+        }
+
+        public int GetSocket(int dir)
+        {
+            if (dir == 0) { return Left; }
+            if (dir == 1) { return TopLeft; }
+            if (dir == 2) { return Top; }
+            if (dir == 3) { return TopRight; }
+            if (dir == 4) { return Right; }
+            if (dir == 5) { return BottomRight; }
+            if (dir == 6) { return Bottom; }
+            if (dir == 7) { return BottomLeft; }
+            else { return -1; }
+        }
+
+        public int GetEntropy()
+        {
+            int entropy = 0;
+
+            for (int i=0; i<8; i++)
+            {
+                if (GetSocket(i) <= 0) { entropy++; }
+            }
+
+            return entropy;
         }
 
         public void Print()
@@ -174,39 +203,55 @@ namespace Test
                 + Bottom.ToString() + " " + BottomLeft.ToString());
         }
 
+        public static bool operator ==(WFCNode me, WFCNode other)
+        {
+            if (me.Left == other.Left && me.TopLeft == other.TopLeft && me.Top == other.Top && me.TopRight == other.TopRight && me.Right == other.Right && me.Bottom == other.Bottom && me.BottomLeft == other.BottomLeft && me.BottomRight == other.BottomRight) {  return true; }
+            return false;
+        }
+        public static bool operator !=(WFCNode me, WFCNode other)
+        {
+            //if (me.Left == other.Left && me.TopLeft == other.TopLeft && me.Top == other.Top && me.TopRight == other.TopRight && me.Right == other.Right && me.Bottom == other.Bottom && me.BottomLeft == other.BottomLeft && me.BottomRight == other.BottomRight) { return false; }
+            return true;
+        }
+
     }
 
     internal class WFCNodes
     {
-        internal WFCNodes() { }
+        internal WFCNodes() {}
+        // DynamicContentManager.Instance.Load<Texture2D>("uncollapsed")
 
-        public static WFCNode Invalid = new(-1, -1, -1, -1, -1, -1, -1, -1);
-        public static WFCNode Node0 = new(2, 2, 2, 2, 2, 2, 2, 2);
-        public static WFCNode Node1 = new(2, 2, 2, 2, 1, 1, 1, 1);
-        public static WFCNode Node2 = new(1, 1, 1, 1, 2, 2, 2, 2);
-        public static WFCNode Node3 = new(1, 1, 1, 1, 1, 1, 1, 1);
-
-        public static Texture2D InvalidTexture = DynamicContentManager.Instance.Load<Texture2D>("invalidTexture");
-        public static Texture2D Node0Texture = DynamicContentManager.Instance.Load<Texture2D>("node0Texture");
-        public static Texture2D Node1Texture = DynamicContentManager.Instance.Load<Texture2D>("node1Texture");
-        public static Texture2D Node2Texture = DynamicContentManager.Instance.Load<Texture2D>("node2Texture");
-        public static Texture2D Node3Texture = DynamicContentManager.Instance.Load<Texture2D>("node3Texture");
-        /*
-        public static WFCNode Node4 = new(2, 2, 2, 2, 2, 2, 2, 2);
-        public static WFCNode Node5 = new(2, 2, 2, 2, 2, 2, 2, 2);
-        public static WFCNode Node6 = new(2, 2, 2, 2, 2, 2, 2, 2);
-        public static WFCNode Node7 = new(2, 2, 2, 2, 2, 2, 2, 2);
-        */
-        public static Texture2D GetTexture(WFCNode node)
+        public static List<WFCNode> nodes = new()
         {
-            if (node == Invalid) { return InvalidTexture; }
-            if (node == Node0) { return Node0Texture; }
-            if (node == Node1) { return Node1Texture; }
-            if (node == Node2) { return Node2Texture; }
-            if (node == Node3) { return Node3Texture; }
-            node.Print();
-            return null;
-        }
+            new WFCNode(0, 0, 0, 0, 0, 0, 0, 0, "uncollapsed"),
+            new WFCNode(0, 0, 0, 0, 0, 0, 0, 0, "void"),
+            new WFCNode(-1, -1, -1, -1, -1, -1, -1, -1, "invalid"),
+            new WFCNode(1, 1, 1, 1, 2, 2, 2, 2, "tile000"),
+            new WFCNode(2, 2, 1, 1, 2, 2, 2, 2, "tile001"),
+            new WFCNode(2, 2, 1, 1, 1, 1, 2, 2, "tile002"), 
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile003"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile004"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile005"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile006"), 
+            new WFCNode(1, 1, 2, 2, 2, 2, 2, 2, "tile007"),
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile008"), 
+            new WFCNode(2, 2, 2, 2, 1, 1, 2, 2, "tile009"), 
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile010"), 
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile011"),
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile012"),
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile013"),
+            new WFCNode(1, 1, 2, 2, 2, 2, 1, 1, "tile014"), 
+            new WFCNode(2, 2, 2, 2, 2, 2, 1, 1, "tile015"), 
+            new WFCNode(2, 2, 2, 2, 1, 1, 1, 1, "tile016"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile017"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile018"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile019"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile020"),
+        };
+
+        public static WFCNode Uncollapsed = nodes[0];
+        public static WFCNode Invalid = nodes[2];
+
     }
     internal class WaveFunctionCollapse
     {
@@ -218,7 +263,7 @@ namespace Test
 
         readonly private Func<Point, WFCNode> _indexer;
 
-        readonly private Func<Point, WFCNode, bool> _setter;
+        readonly private Func<Point, WFCNode, bool, bool> _setter;
 
         // The function to get the size of the grid.
         readonly private Func<Point> _getSize;
@@ -232,7 +277,6 @@ namespace Test
 
         private Point _startPoint;
 
-        private List<WFCNode> _WFCNodes;
 
 
         readonly private Random _random;
@@ -245,8 +289,8 @@ namespace Test
         /// <param name="grid">A newly initialized grid, defined however you want.</param>
         /// <param name="isGridSquareCollapsable">A function defining if the grid square at an index is collapsable, or if it should be seen as a void.</param>
         /// <param name="getSize">This gets the size of the grid. It's important this is a function, not an int, that way if the size changes it gets updated here.</param>
-        /// <param name="socketsPerGridSquare">The sockets each Grid Square has, either 4 (up, down, right, left) or 9 (diagonals too).</param>
-        public WaveFunctionCollapse(Grid grid, Func<Point, bool> isGridSquareCollapsable, Func<Point> getSize, Func<Point, WFCNode> indexer, Func<Point, WFCNode, bool> setter,  int socketsPerGridSquare = 8, int socketTypes = 8)
+        /// <param name="socketsPerGridSquare">The sockets each Grid Square has, either 4 (up, down, right, left) or 8 (diagonals too).</param>
+        public WaveFunctionCollapse(Grid grid, Func<Point, bool> isGridSquareCollapsable, Func<Point> getSize, Func<Point, WFCNode> indexer, Func<Point, WFCNode, bool, bool> setter, int socketsPerGridSquare = 8, int socketTypes = 8)
         {
             _grid = grid;
             _isGridSquareCollapsable = isGridSquareCollapsable;
@@ -254,9 +298,10 @@ namespace Test
             _indexer = indexer;
             _setter = setter;
             _WFCNodeType = Convert.ToBoolean((socketsPerGridSquare / 4) - 1);
-            _WFCNodes = new List<WFCNode>() { WFCNodes.Node0, WFCNodes.Node1, WFCNodes.Node2, WFCNodes.Node3 };
 
             _random = new ();
+            _lowestEntropy  = new List<Point>();
+            _lowestEntropyValue = 8;
 
             Initialize();            
         }
@@ -265,9 +310,9 @@ namespace Test
         {
             foreach (Point point in Looper())
             {
-                WFCNode node = new(_WFCNodeType);
-                _setter(point, node);
-
+                WFCNode node = new (_WFCNodeType);
+                _setter(point, node, true);
+                _grid.SetPathable(point, true);
             }
 
             _startPoint = new Point(_random.Next(0, _getSize().X), _random.Next(0, _getSize().Y));
@@ -283,53 +328,57 @@ namespace Test
             
             */
 
+            WFCNode startNode = _indexer(_startPoint);
+
             for (int i = 0; i < 8; i++)
             {
-                _indexer(_startPoint).Pack(2, i);
+                startNode.Pack(2, i);
             }
+            _lowestEntropy.Add(_startPoint);
+            _lowestEntropyValue = 0;
 
-            /*
             // _startPoint gets assigned all 2s in it's sockets
-            foreach (Point3 point in GetNeighbors(_startPoint))
-            {
-                Point neighbor = new (point.X, point.Y);
-
-                if (_indexer(neighbor) != null)
-                {
-                    _indexer(neighbor).Pack(2, point.Z);
-                    AddToEntropyList(neighbor, 7);
-                }
-
-
-            }
-            */
-
+            for (int i=0; i<2000; i++) { Collapse(); }
         }
 
         public void Collapse()
         {
+            if (_lowestEntropy.Count <= 0) { throw new Exception("woag"); }
             int i = _random.Next(0, _lowestEntropy.Count);
 
-            WFCNode node = GetRandomOption(_lowestEntropy[i]);
-
-            _setter(_lowestEntropy[i], node);
-
+            Point nodePoint = _lowestEntropy[i];
+            WFCNode node = GetRandomOption(nodePoint);
             _lowestEntropy.RemoveAt(i);
+
+            _setter(nodePoint, node, false);
+            UpdateNeighbors(nodePoint);
+
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        private void UpdateNeighbors(Point point)
         {
-            foreach (Point point in Looper())
-            {
-                spriteBatch.Draw(WFCNodes.GetTexture(_indexer(point)), new Rectangle(point.X, point.Y, 10, 10), Color.White);
-            }
-        }
+            WFCNode node = _indexer(point);
+            //Debug.WriteLine("   Point: ");
+            //node.Print();
 
+            foreach (Point3 neighbor in GetNeighbors(point))
+            {
+                Point neighborPos = new(neighbor.X, neighbor.Y);
+                //Debug.WriteLine(_grid.IsPathable(neighborPos) + " location: " + neighborPos.ToString() + " direction: " + neighbor.Z.ToString());
+
+                if (_indexer(neighborPos) != null && _isGridSquareCollapsable(neighborPos))
+                {
+                    _indexer(neighborPos).Pack(node.GetSocket(neighbor.Z), MirrorSocket(neighbor.Z));
+                    _indexer(neighborPos).Pack(node.GetSocket(neighbor.Z + 1), MirrorSocket(neighbor.Z + 1));
+                    AddToEntropyList(neighborPos, node.GetEntropy());
+                }
+            }
+
+        }
 
         public void AddToEntropyList(Point point, int entropy)
         {
-            //if (_lowestEntropy.Count == 0) { throw new Exception("Uhhh.. ");  }
-            
+            //Debug.WriteLine(point.ToString() + entropy.ToString());
             if (entropy > _lowestEntropyValue) { return; }
             
             if (entropy == _lowestEntropyValue) { _lowestEntropy.Add(point); return; }
@@ -338,7 +387,48 @@ namespace Test
             _lowestEntropy.Add(point);
             _lowestEntropyValue = entropy;
         }
+        private WFCNode GetRandomOption(Point point)
+        {
+            WFCNode self = _indexer(point);
+            int bestScore = 0;
+            WFCNode bestNode = WFCNodes.Invalid;
 
+            foreach (WFCNode other in WFCNodes.nodes)
+            {
+                int score = -1;
+
+
+                for (int i = 0; i < 8; i++)
+                {
+                    if (self.GetSocket(i) == other.GetSocket(i)) { score++; continue; }
+                    if (self.GetSocket(i) != 0) { score = -10; }
+                }
+
+                if (_random.Next(0, 2) == 0)
+                {
+                    if (score > bestScore) { bestScore = score; bestNode = other; }
+                }
+                else
+                {
+                    if (score >= bestScore) { bestScore = score; bestNode = other; }
+                }
+            }
+            if (bestNode == WFCNodes.Invalid) { Debug.WriteLine("No matching node found!"); }
+            //self.Print();
+            return bestNode;
+        }
+        public IEnumerable<Point3> GetNeighbors(Point point)
+        {
+            yield return new Point3(point.X - 1, point.Y, 0);
+            yield return new Point3(point.X, point.Y - 1, 2);
+            yield return new Point3(point.X + 1, point.Y, 4);
+            yield return new Point3(point.X, point.Y + 1, 6);
+        }
+
+        public static int MirrorSocket(int socket)
+        {
+            return socket % 2 == 0 ? (socket + 5) % 8 : (socket + 3) % 8;
+        }
         /// <summary>
         /// This creates a short-hand way of accessing each point in the grid.
         /// </summary>
@@ -356,46 +446,13 @@ namespace Test
             }
         }
 
-        public IEnumerable<Point3> GetNeighbors(Point point)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            if (!_WFCNodeType)
+            foreach (Point point in Looper())
             {
-                yield return new Point3(point.X - 1, point.Y, 0);
-                yield return new Point3(point.X + 1, point.Y, 4);
-                yield return new Point3(point.X, point.Y - 1, 2);
-                yield return new Point3(point.X, point.Y + 1, 6);
-            }
-            else
-            {
-                yield return new Point3(point.X - 1, point.Y - 1, 1);
-                yield return new Point3(point.X, point.Y - 1, 2);
-                yield return new Point3(point.X + 1, point.Y - 1, 3);
-                yield return new Point3(point.X - 1, point.Y, 0);
-                yield return new Point3(point.X + 1, point.Y, 4);
-                yield return new Point3(point.X - 1, point.Y + 1, 7);
-                yield return new Point3(point.X, point.Y + 1, 6);
-                yield return new Point3(point.X + 1, point.Y + 1, 5);
+                //spriteBatch.Draw(null, new Rectangle(point.X * 10, point.Y * 10, 10, 10), Color.White);
             }
         }
 
-        private WFCNode GetRandomOption(Point point)
-        {
-            WFCNode self = _indexer(point);
-
-            foreach (WFCNode other in _WFCNodes)
-            {
-                if (self.Left != 0 && self.Left != other.Left) { continue; }
-                if (self.TopLeft != 0 && self.TopLeft != other.TopLeft) { continue; }
-                if (self.Top != 0 && self.Top != other.Top) { continue; }
-                if (self.TopRight != 0 && self.TopRight != other.TopRight) { continue; }
-                if (self.Right != 0 && self.Right != other.Right) { continue; }
-                if (self.BottomRight != 0 && self.BottomRight != other.BottomRight) { continue; }
-                if (self.Bottom != 0 && self.Bottom != other.Bottom) { continue; }
-                if (self.BottomLeft != 0 && self.BottomLeft != other.BottomLeft) { continue; }
-
-                return other;
-            }
-            return WFCNodes.Invalid;
-        }
     }
 }
