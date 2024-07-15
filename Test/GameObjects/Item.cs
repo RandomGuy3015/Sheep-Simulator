@@ -30,7 +30,9 @@ namespace Test
         public Rectangle RectangleAfterCollision { get; }
         public int CollisionPriority { get; set; }
         public Rectangle RectangleNew { get; }
-
+        public int Energy { get; set; }
+        public int Reproduction { get; set; }
+        public int Age { get; set; }
 
         protected Vector2 mCenter;
         protected float mScale;
@@ -131,6 +133,9 @@ namespace Test
             ObjectId = objectid;
             Random random = new Random();
 
+            Asset = "poop.png";
+            mSound = "fart.wav";
+
             // sometimes poop disappears directly
             if (random.Next(0, 5) == 1)
             {
@@ -138,8 +143,6 @@ namespace Test
                 return;
             }
             
-            Asset = "poop.png";
-            mSound = "fart.wav";
             
             int randomInt = Math.Clamp((int) Math.Pow(Gold * 1.25f, 1f / 2.9f) - 2, 1, 6);
             
@@ -165,7 +168,7 @@ namespace Test
             Vector2 newPosition = Position;
            
             // sound
-            Game1.SoundManager.PlaySfx(mSound);
+            Game1.SoundManager.PlaySfxChecked(mSound);
             
         }
 

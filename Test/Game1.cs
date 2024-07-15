@@ -30,7 +30,10 @@ namespace Test
         private Sheep mSheep;
         private Sheep mShaun;
         public static Dictionary<int, Item> ItemDict;
+        public static Dictionary<int, Sheep> SheepDict;
+        public static Dictionary<int, Sheep> SheepQueue;
         public static int ItemCount;
+        public static int SheepCount;
 
         private Vector2 _size;
         private int _gridSquareSize;
@@ -132,10 +135,13 @@ namespace Test
 
             ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
             
-            mSheep = new Sheep(new Vector2(1000, 1000), "sheep.png", 0.05f, 0.2f, 500);
-            mShaun = new Sheep(new Vector2(1000, 1000), "shaun.png", 0.05f, 0.45f, 500);
+            mSheep = new Sheep(new Vector2(1000, 1000), "sheep.png",0, 0.05f, 0.2f, 1000);
+            mShaun = new Sheep(new Vector2(1000, 1000), "shaun.png",1, 0.05f, 0.45f,1000);
             ItemDict = new Dictionary<int, Item>();
+            SheepDict = new Dictionary<int, Sheep>();
+            SheepQueue = new Dictionary<int, Sheep>();
             ItemCount = 0;
+            SheepCount = 2; // 2 objects spawned already
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -151,6 +157,17 @@ namespace Test
             foreach (Item item in ItemDict.Values)
             {
                 item.Update(gameTime);
+            }
+
+            foreach (Sheep sheep in SheepDict.Values)
+            {
+                sheep.Update(gameTime);
+                
+            }
+
+            foreach (Sheep sheep in SheepQueue.Values)
+            {
+                SheepDict.TryAdd(sheep.ObjectId, sheep);
             }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -191,10 +208,15 @@ namespace Test
             {
                 item.Draw(_spriteBatch);
             }
+            
+            foreach (Sheep sheep in SheepDict.Values)
+            {
+                sheep.Draw(_spriteBatch);
+            }
 
             _spriteBatch.End();
 
-
+            
             // other
             GraphicsDevice.SetRenderTarget(null);
             

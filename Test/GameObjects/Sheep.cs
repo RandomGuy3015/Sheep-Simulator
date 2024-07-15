@@ -20,7 +20,6 @@ namespace Test
         public Vector2 PositionAfterCollision { get; set; }
         
 
-
         public float Speed { get; set; }
         public float SpeedSprint { get; set; }
         public int Damage { get; set; }
@@ -30,8 +29,10 @@ namespace Test
         public List<int> StandingOver { get; set; }
 
         public string Asset { get; set; }
-        public int Gold { get; set; }
-        public int Xp { get; set; }
+        public int Energy { get; set; }
+        public int Reproduction { get; set; }
+        public int Age { get; set; }
+
 
         // Collision
         public int CollisionPriority { get; set; }
@@ -48,10 +49,11 @@ namespace Test
         DateTime startTime;
 
 
-        public Sheep(Vector2 position, string textureName, float speed, float scale, int range)
+        public Sheep(Vector2 position, string textureName,int objectId, float speed, float scale, int range)
 		{
             Position = position;
             Asset = textureName;
+            ObjectId = objectId;
             mCenter = new Vector2((ContentDictionary.TextureDict[Asset].Width / 2), (ContentDictionary.TextureDict[Asset].Height / 2));
             Direction = new Vector2(0, 0);
             startTime = DateTime.Now;
@@ -59,6 +61,7 @@ namespace Test
             mScale = scale;
             mRange = range;
             SetDestination(mRange);
+            Reproduction = 0;
 
         }
         public Vector2 Center()
@@ -89,18 +92,23 @@ namespace Test
             if ((mDestination - Position).Length() > 1)
             {
                 MoveStep(false);
-                Game1.ItemDict[Game1.ItemCount] = new Item(Game1.ItemCount, Position, "dot.png");
-                Game1.ItemCount++;
-
             }
             else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
             {
                 startTime = DateTime.Now;
-                Game1.SoundManager.PlaySfx("sheepSound.wav");
+                Game1.SoundManager.PlaySfxChecked("sheepSound.wav");
                 SetDestination(mRange);
                 Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
                 Game1.ItemCount++;
+                Reproduction++;
             }
+            if (Reproduction >= 1)
+            {
+                Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, 0.05f, 0.2f, mRange);
+                Game1.SheepCount++;
+                Reproduction = 0;
+            }
+            
         }
 
         public void OnCollision(ICollidable collidingWith) { }
@@ -109,8 +117,7 @@ namespace Test
         {
 
             Behaviour(gameTime);
-            
-            
+         
         }
 
         public void Animate(GameTime gameTime) { }
@@ -119,7 +126,7 @@ namespace Test
         {
             // (float)Math.Atan2(Direction.Y, Direction.X) -> projectiles
             spriteBatch.Draw(ContentDictionary.TextureDict[Asset], Position, null, Color.White,0, mCenter, mScale / 3, SpriteEffects.None, 0);
-
+            
         }
     }
 }

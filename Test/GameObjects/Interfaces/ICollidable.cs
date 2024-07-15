@@ -12,8 +12,9 @@ public interface ICollidable : IGameObject
     public bool IsAlly { get; set; }
     public int StandingOn { get; set; }
     public List<int> StandingOver { get; set; }
-    public int Gold { get; set; }
-    public int Xp { get; set; }
+    public int Energy { get; set; }
+    public int Reproduction { get; set; }
+    public int Age { get; set; }
     public Vector2 PositionNew { get; set; }
     public Vector2 PositionAfterCollision { get; set; }
     public Rectangle RectangleAfterCollision { get; }
