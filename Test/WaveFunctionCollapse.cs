@@ -365,7 +365,7 @@ namespace Test
 
         public void Collapse()
         {
-            if (_lowestEntropy.Count <= 0) { throw new Exception("woag"); }
+            if (_lowestEntropy.Count <= 0) { Debug.WriteLine("done"); return; }
             int i = _random.Next(0, _lowestEntropy.Count);
 
             Point nodePoint = _lowestEntropy[i];
@@ -412,12 +412,12 @@ namespace Test
         private WFCNode GetRandomOption(Point point)
         {
             WFCNode self = _indexer(point);
-            int bestScore = 0;
+            float bestScore = 0f;
             WFCNode bestNode = WFCNodes.Invalid;
 
             foreach (WFCNode other in WFCNodes.nodes)
             {
-                float score = -1;
+                float score = -1f;
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -425,9 +425,9 @@ namespace Test
                     if (self.GetSocket(i) != 0) { score = -10f; }
                 }
 
-                if (other.GetTileType() == 1 && _random.Next(0,3) > 0) { score += 0.5f; }
-                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += 1f; }
-                if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 2) > 0) { score += 1f; }
+                if (other.GetTileType() == 1 && _random.Next(0,4) > 0) { score += .5f; }
+                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += .9f; }
+                if ((other.Name == "tile018" || other.Name == "tile019" || other.Name == "tile020") && _random.Next(0, 6) > 0) { score -= .8f; }
 
                 if (_random.Next(0, 2) == 0)
                 {
