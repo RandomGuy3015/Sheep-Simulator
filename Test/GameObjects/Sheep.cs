@@ -32,6 +32,8 @@ namespace Test
         public int Energy { get; set; }
         public int mReproduction { get; set; }
         public int Age { get; set; }
+        public bool Gender { get; set; }
+        public bool ReproductionMode { get; set; }
 
 
         // Collision
@@ -44,12 +46,14 @@ namespace Test
         private Vector2 mCenter;
         private float mScale;
         private int mRange;
+        private int LoverId; // Id to find Lover Sheep
+
 
         // time
         DateTime startTime;
 
 
-        public Sheep(Vector2 position, string textureName, int objectId, float speed, float scale, int range)
+        public Sheep(Vector2 position, string textureName, int objectId, float speed, bool gender, float scale, int range)
         {
             Position = position;
             Asset = textureName;
@@ -58,12 +62,14 @@ namespace Test
             Direction = new Vector2(0, 0);
             startTime = DateTime.Now;
             Speed = speed;
+            Gender = gender;
             mScale = scale / 3;
             mRange = range;
             SetDestination(mRange, true);
             mReproduction = 0;
             Rectangle = new Rectangle(ContentDictionary.TextureDict[Asset].Width, ContentDictionary.TextureDict[Asset].Height, (int)mCenter.X, (int)mCenter.Y);
 
+            ReproductionMode = false;
         }
         public Vector2 Center()
         {
@@ -99,31 +105,40 @@ namespace Test
 
         public void Behaviour(GameTime gameTime)
         {
-            // sheep trys to get as close as possible to the Destination
-            if ((mDestination - Position).Length() > 1)
+            if (!ReproductionMode)
             {
-                MoveStep(false);
-            }
-            else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
-            {
-                startTime = DateTime.Now;
-                Game1.SoundManager.PlaySfxChecked("sheepSound.wav");
-                SetDestination(mRange, true);
-
-                Random random = new Random();
-
-                if (random.Next(0, 20) == 5)
+                // sheep trys to get as close as possible to the Destination
+                if ((mDestination - Position).Length() > 1)
                 {
-                    Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
-                    Game1.ItemCount++;
+                    MoveStep(false);
                 }
-                mReproduction++;
-            }
-            if (mReproduction >= 5)
-            {
-                LookForLove();
+                else if ((DateTime.Now - startTime).TotalMilliseconds > 250)
+                {
+                    startTime = DateTime.Now;
+                    Game1.SoundManager.PlaySfxChecked("sheepSound.wav");
+                    SetDestination(mRange, true);
 
-                mReproduction = 0;
+                    Random random = new Random();
+
+                    if (random.Next(0, 20) == 5)
+                    {
+                        Game1.ItemDict[Game1.ItemCount] = new Poop(Game1.ItemCount, Position);
+                        Game1.ItemCount++;
+                    }
+                    mReproduction++;
+                }
+                if (mReproduction >= 2)
+                {
+                
+                       LookForLove();
+                
+
+                    mReproduction = 0;
+                }
+            }
+            else
+            {
+                Reproduction();
             }
 
         }
@@ -132,20 +147,39 @@ namespace Test
         {
             foreach (Sheep sheep in Game1.SheepDict.Values)
             {
-                if (sheep.Position != Position)
+                if (sheep.ObjectId != ObjectId && Gender)
                 {
+                    sheep.LoverId = ObjectId;
                     mDestination = sheep.Position;
                     SetDestination(100, false);
-                    sheep.mReproduction = 5;
+                    sheep.mReproduction = 0;
                     sheep.Speed = 0;
+                    sheep.Reproduction();
+                    break;
                 }
             }
         }
 
         public void Reproduction()
         {
-            Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, Speed, 0.2f, mRange);
-            Game1.SheepCount++;
+            if (Game1.SheepDict[LoverId].Rectangle.Intersects(Rectangle))
+            {
+
+                Random random = new Random();
+
+                int randomInt = random.Next(0, 2);
+                if (randomInt == 1)
+                {
+                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, Speed, true, 0.2f, mRange);
+
+                }
+                else
+                {
+                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "shaun.png", Game1.SheepCount, Speed, false, 0.2f, mRange);
+                }
+                Speed = 1;
+                Game1.SheepCount++;
+            }
         }
 
         public void OnCollision(ICollidable collidingWith)

@@ -33,6 +33,7 @@ namespace Test
         public int Energy { get; set; }
         public int mReproduction { get; set; }
         public int Age { get; set; }
+        public bool Gender { get; set; }
 
         protected Vector2 mCenter;
         protected float mScale;

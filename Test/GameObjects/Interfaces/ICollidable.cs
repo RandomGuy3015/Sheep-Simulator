@@ -15,6 +15,11 @@ public interface ICollidable : IGameObject
     public int Energy { get; set; }
     public int mReproduction { get; set; }
     public int Age { get; set; }
+    /// <summary>
+    /// true is female
+    /// </summary>
+    public bool Gender { get; set; } 
+    
     public Vector2 PositionNew { get; set; }
     public Vector2 PositionAfterCollision { get; set; }
     public Rectangle RectangleAfterCollision { get; }
