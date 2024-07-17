@@ -195,6 +195,29 @@ namespace Test
 
             return entropy;
         }
+        //      0000_0000_0000_0000
+        
+        public int GetTileType()
+        {
+            int[] typeCount = new int[8];
+            for (int i=0; i<8; i++)
+            {
+                if (GetSocket(i) < 0) { continue; }
+                typeCount[GetSocket(i)] += 1;
+            }
+            int best = 0;
+            int bestScore = 0;
+            for (int i=0; i<8; i++)
+            {
+                if (typeCount[i] >= bestScore)
+                {
+                    best = i;
+                    bestScore = typeCount[i];
+                }
+            }
+            return best;
+        }
+        
 
         public void Print()
         {
@@ -338,8 +361,6 @@ namespace Test
             _lowestEntropy.Add(_startPoint);
             _lowestEntropyValue = 0;
 
-            // _startPoint gets assigned all 2s in it's sockets
-            for (int i=0; i<10000; i++) { Collapse(); }
         }
 
         public void Collapse()
@@ -396,27 +417,28 @@ namespace Test
 
             foreach (WFCNode other in WFCNodes.nodes)
             {
-                int score = -1;
+                float score = -1;
 
                 for (int i = 0; i < 8; i++)
                 {
                     if (self.GetSocket(i) == other.GetSocket(i)) { score++; continue; }
-                    if (self.GetSocket(i) != 0) { score = -10; }
+                    if (self.GetSocket(i) != 0) { score = -10f; }
                 }
 
-                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += 1; }
-                if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 2) > 0) { score += 1; }
+                if (other.GetTileType() == 1 && _random.Next(0,3) > 0) { score += 0.5f; }
+                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += 1f; }
+                if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 2) > 0) { score += 1f; }
 
                 if (_random.Next(0, 2) == 0)
                 {
-                    if (score > bestScore) { bestScore = score; bestNode = other; }
+                    if (score > bestScore) { bestScore = (int)score; bestNode = other; }
                 }
                 else
                 {
-                    if (score >= bestScore) { bestScore = score; bestNode = other; }
+                    if (score >= bestScore) { bestScore = (int)score; bestNode = other; }
                 }
             }
-            if (bestNode == WFCNodes.Invalid) { Debug.WriteLine("No matching node found!"); }
+            //if (bestNode == WFCNodes.Invalid) { Debug.WriteLine("No matching node found!"); }
             //self.Print();
             return bestNode;
         }

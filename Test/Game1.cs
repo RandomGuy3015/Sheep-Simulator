@@ -15,12 +15,11 @@ namespace Test
     {
         // ########################################   VARIABLES   #############################################
 
-        // ---------------------------------------   MONOGAME VARS   -----------------------------------------
 
-        private SpriteBatch _spriteBatch;
-        private RenderTarget2D _renderTarget;
-        private Camera _camera;
-        private GraphicsDeviceManager _graphics;
+        // -----------------------------------------   GRID VARS   -------------------------------------------
+
+        private Grid _grid;
+        private Grid _WFCGrid;
 
         // -----------------------------------------   MANAGERS   --------------------------------------------
 
@@ -29,10 +28,12 @@ namespace Test
         private InputManager _inputManager;
         public static SoundManager SoundManager;
 
-        // -----------------------------------------   GRID VARS   -------------------------------------------
+        // ---------------------------------------   MONOGAME VARS   -----------------------------------------
 
-        private Grid _grid;
-        private Grid _WFCGrid;
+        private SpriteBatch _spriteBatch;
+        private RenderTarget2D _renderTarget;
+        private Camera _camera;
+        private GraphicsDeviceManager _graphics;
 
         // ---------------------------------------   SETTINGS VARS   -----------------------------------------
 
@@ -70,11 +71,11 @@ namespace Test
 
         protected override void Initialize()
         {
-            // -----------------------------------   MONOGAME VARS   --------------------------------------------
 
-            _renderTarget = new RenderTarget2D(GraphicsDevice, 1000, 1000, false, GraphicsDevice.PresentationParameters.BackBufferFormat,
-                DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
-            _camera = new(_graphics, _inputManager);
+            // ------------------------------------   GRID VARS   ------------------------------------------------
+
+            _grid = new(_size, _gridSquareSize, new Vector2(0, 0));
+            _WFCGrid = new(_size, _gridSquareSize, Vector2.Zero);
 
 
             // -------------------------------------   MANAGERS   -----------------------------------------------
@@ -84,11 +85,13 @@ namespace Test
             _inputManager = new(new());
             _waveFunctionCollapse = new(_WFCGrid, _WFCGrid.IsPathable, () => new Point((int)_size.X, (int)_size.Y), _WFCGrid.GetNode, _WFCGrid.SetNode);
 
+            // -----------------------------------   MONOGAME VARS   --------------------------------------------
 
-            // ------------------------------------   GRID VARS   ------------------------------------------------
+            _renderTarget = new RenderTarget2D(GraphicsDevice, 1000, 1000, false, GraphicsDevice.PresentationParameters.BackBufferFormat,
+                DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+            _camera = new(_graphics, _inputManager);
 
-            _grid = new(_size, _gridSquareSize, new Vector2(0, 0));
-            _WFCGrid = new(_size, _gridSquareSize, Vector2.Zero);
+
 
             base.Initialize();
         }
@@ -125,6 +128,10 @@ namespace Test
             var inputState = _inputManager.Update();
 
             _camera.Update(inputState, _graphics);
+            for (int i = 0; i < 10; i++) {
+                _waveFunctionCollapse.Collapse();
+            }
+
 
             base.Update(gameTime);
         }
@@ -149,7 +156,6 @@ namespace Test
             //_grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
             //_grid.DrawGrid(_spriteBatch);
             _waveFunctionCollapse.Draw(_spriteBatch);
-            //_waveFunctionCollapse.Collapse();
           
             // IMPORTANT POOP DRAW
             foreach (Item item in ItemDict.Values)
