@@ -46,7 +46,7 @@ namespace Test
         private Vector2 mCenter;
         private float mScale;
         private int mRange;
-        private int LoverId; // Id to find Lover Sheep
+        public int LoverId; // Id to find Lover Sheep
 
 
         // time
@@ -127,9 +127,9 @@ namespace Test
                     }
                     mReproduction++;
                 }
-                if (mReproduction >= 2)
+                if (mReproduction >= 4 && !Gender)
                 {
-                
+                    
                        LookForLove();
                 
 
@@ -147,7 +147,7 @@ namespace Test
         {
             foreach (Sheep sheep in Game1.SheepDict.Values)
             {
-                if (sheep.ObjectId != ObjectId && Gender)
+                if (sheep.ObjectId != ObjectId && sheep.Gender)
                 {
                     sheep.LoverId = ObjectId;
                     mDestination = sheep.Position;
@@ -155,6 +155,7 @@ namespace Test
                     sheep.mReproduction = 0;
                     sheep.Speed = 0;
                     sheep.Reproduction();
+                    sheep.ReproductionMode = true;
                     break;
                 }
             }
@@ -162,7 +163,7 @@ namespace Test
 
         public void Reproduction()
         {
-            if (Game1.SheepDict[LoverId].Rectangle.Intersects(Rectangle))
+            if ((Game1.SheepDict[LoverId].Position - Position).Length() < 1)
             {
 
                 Random random = new Random();
@@ -170,12 +171,12 @@ namespace Test
                 int randomInt = random.Next(0, 2);
                 if (randomInt == 1)
                 {
-                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, Speed, true, 0.2f, mRange);
+                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "sheep.png", Game1.SheepCount, 1, true, 0.1f, mRange);
 
                 }
                 else
                 {
-                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "shaun.png", Game1.SheepCount, Speed, false, 0.2f, mRange);
+                    Game1.SheepQueue[Game1.SheepCount] = new Sheep(Position, "shaun.png", Game1.SheepCount, 1, false, 0.2f, mRange);
                 }
                 Speed = 1;
                 Game1.SheepCount++;
@@ -192,15 +193,7 @@ namespace Test
 
             Behaviour(gameTime);
 
-            /*
-            foreach (Sheep sheep in Game1.SheepDict.Values)
-            {
-                if (Rectangle.Intersects(sheep.Rectangle))
-                {
-                    OnCollision(sheep);
-                }
-
-            }*/
+            
          
         }
 

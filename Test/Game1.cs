@@ -96,24 +96,6 @@ namespace Test
             base.Initialize();
         }
 
-<<<<<<< Updated upstream
-=======
-        protected override void LoadContent()
-        {
-            List<string> everythingEverywhereAllAtOnce = ContentList();
-
-            ContentDictionary.LoadContent(everythingEverywhereAllAtOnce, Content);
-            ItemDict = new Dictionary<int, Item>();
-            SheepDict = new Dictionary<int, Sheep>();
-            SheepQueue = new Dictionary<int, Sheep>();
-            ItemCount = 0;
-            SheepCount = 2; // 2 objects spawned already
-
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, true, 0.2f, 2000);
-            SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, false, 0.45f, 2000);
->>>>>>> Stashed changes
 
 
         // #######################################################################################################
@@ -228,11 +210,8 @@ namespace Test
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, 0.2f, 2000);
-            SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, 0.45f, 2000);
-
-
-            // TODO: use this.Content to load your game content here
+            SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, true, 0.2f, 2000);
+            SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, false, 0.45f, 2000);
         }
 
         private List<string> ContentList()
