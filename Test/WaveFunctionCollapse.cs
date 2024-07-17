@@ -10,6 +10,7 @@ using Test.Helper_classes;
 using System.Linq;
 using Test.InputMangement;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Test
 {
@@ -250,27 +251,37 @@ namespace Test
             new WFCNode(0, 0, 0, 0, 0, 0, 0, 0, "uncollapsed"),
             new WFCNode(0, 0, 0, 0, 0, 0, 0, 0, "void"),
             new WFCNode(-1, -1, -1, -1, -1, -1, -1, -1, "invalid"),
-            new WFCNode(1, 1, 1, 1, 2, 2, 2, 2, "tile000"),
-            new WFCNode(2, 2, 1, 1, 2, 2, 2, 2, "tile001"),
-            new WFCNode(2, 2, 1, 1, 1, 1, 2, 2, "tile002"), 
+            new WFCNode(1, 1, 1, 1, 1, 2, 2, 1, "tile000"),
+            new WFCNode(2, 1, 1, 1, 1, 2, 2, 2, "tile001"),
+            new WFCNode(2, 1, 1, 1, 1, 1, 1, 2, "tile002"), 
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile003"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile004"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile005"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile006"), 
-            new WFCNode(1, 1, 2, 2, 2, 2, 2, 2, "tile007"),
+            new WFCNode(1, 1, 1, 2, 2, 2, 2, 1, "tile007"),
             new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile008"), 
-            new WFCNode(2, 2, 2, 2, 1, 1, 2, 2, "tile009"), 
+            new WFCNode(2, 2, 2, 1, 1, 1, 1, 2, "tile009"), 
             new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile010"), 
             new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile011"),
             new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile012"),
             new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile013"),
-            new WFCNode(1, 1, 2, 2, 2, 2, 1, 1, "tile014"), 
-            new WFCNode(2, 2, 2, 2, 2, 2, 1, 1, "tile015"), 
-            new WFCNode(2, 2, 2, 2, 1, 1, 1, 1, "tile016"),
+            new WFCNode(1, 1, 1, 2, 2, 1, 1, 1, "tile014"), 
+            new WFCNode(1, 2, 2, 2, 2, 1, 1, 1, "tile015"), 
+            new WFCNode(1, 2, 2, 1, 1, 1, 1, 1, "tile016"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile017"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile018"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile019"),
             new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile020"),
+            new WFCNode(2, 2, 2, 1, 1, 2, 2, 2, "tile0200"),
+            new WFCNode(2, 2, 2, 2, 2, 1, 1, 2, "tile0201"),
+            new WFCNode(1, 2, 2, 2, 2, 2, 2, 1, "tile0202"),
+            new WFCNode(2, 1, 1, 2, 2, 2, 2, 2, "tile0203"),
+            new WFCNode(1, 1, 1, 2, 2, 2, 1, 1, "tile0204"),
+            new WFCNode(1, 1, 1, 1, 1, 2, 2, 2, "tile0205"),
+            new WFCNode(2, 2, 1, 1, 1, 1, 1, 2, "tile0206"),
+            new WFCNode(1, 2, 2, 2, 1, 1, 1, 1, "tile0207"),
+            new WFCNode(2, 1, 1, 2, 2, 1, 1, 2, "tile0208"),
+            new WFCNode(2, 2, 2, 1, 1, 2, 2, 1, "tile0209"),
         };
 
         public static WFCNode Uncollapsed = nodes[0];
@@ -295,9 +306,9 @@ namespace Test
         // This defines how the WFCNode is packed. False is 4*4 bits, True is 4*8 bits.
         readonly private bool _WFCNodeType;
 
-        private List<Point> _lowestEntropy;
+        private Dictionary<int, List<Point>> _entropy;
 
-        private int _lowestEntropyValue;
+        private int _lowestEntropy;
 
         private Point _startPoint;
 
@@ -324,8 +335,8 @@ namespace Test
             _WFCNodeType = Convert.ToBoolean((socketsPerGridSquare / 4) - 1);
 
             _random = new ();
-            _lowestEntropy  = new List<Point>();
-            _lowestEntropyValue = 8;
+            _entropy  = new Dictionary<int, List<Point>>();
+            _lowestEntropy = 8;
 
             Initialize();            
         }
@@ -339,7 +350,12 @@ namespace Test
                 _grid.SetPathable(point, true);
             }
 
-            _startPoint = new Point(_random.Next(0, _getSize().X), _random.Next(0, _getSize().Y));
+            _startPoint = new Point(_getSize().X - 1, _getSize().Y - 1);
+
+            for (int i = 0; i<9; i++)
+            {
+                _entropy.Add(i, new List<Point>());
+            }
 
             /*
             int x = 0;
@@ -358,23 +374,32 @@ namespace Test
             {
                 startNode.Pack(2, i);
             }
-            _lowestEntropy.Add(_startPoint);
-            _lowestEntropyValue = 0;
+            _entropy[8].Add(_startPoint);
 
+            while (Collapse()) { }
         }
 
-        public void Collapse()
+        public bool Collapse()
         {
-            if (_lowestEntropy.Count <= 0) { Debug.WriteLine("done"); return; }
-            int i = _random.Next(0, _lowestEntropy.Count);
+            int i = _lowestEntropy;
+            while (_entropy[i].Count == 0)
+            {
+                i++;
+                if (i > 8) { return false; }
+            }
+            _lowestEntropy = i;
 
-            Point nodePoint = _lowestEntropy[i];
+            Point nodePoint = _entropy[_lowestEntropy].First();
+            if (_indexer(nodePoint).GetEntropy() == 0) { _entropy[_lowestEntropy].Remove(nodePoint); }
+
+            _entropy[_lowestEntropy].Remove(nodePoint);
+
             WFCNode node = GetRandomOption(nodePoint);
-            _lowestEntropy.RemoveAt(i);
 
             _setter(nodePoint, node, false);
             UpdateNeighbors(nodePoint);
 
+            return true;
         }
 
         private void UpdateNeighbors(Point point)
@@ -392,7 +417,7 @@ namespace Test
                 {
                     _indexer(neighborPos).Pack(node.GetSocket(neighbor.Z), MirrorSocket(neighbor.Z));
                     _indexer(neighborPos).Pack(node.GetSocket(neighbor.Z + 1), MirrorSocket(neighbor.Z + 1));
-                    AddToEntropyList(neighborPos, node.GetEntropy());
+                    AddToEntropyList(neighborPos, _indexer(neighborPos).GetEntropy());
                 }
             }
 
@@ -401,14 +426,18 @@ namespace Test
         public void AddToEntropyList(Point point, int entropy)
         {
             //Debug.WriteLine(point.ToString() + entropy.ToString());
-            if (entropy > _lowestEntropyValue) { return; }
+            _entropy[entropy].Add(point); 
             
-            if (entropy == _lowestEntropyValue) { _lowestEntropy.Add(point); return; }
 
-            _lowestEntropy.Clear();
-            _lowestEntropy.Add(point);
-            _lowestEntropyValue = entropy;
+            if (entropy < _lowestEntropy) { _lowestEntropy = entropy; }
         }
+
+        public bool UpdateEntropy(Point nodePoint)
+        {
+            _entropy[_lowestEntropy].Remove(nodePoint);
+            return true;
+        }
+
         private WFCNode GetRandomOption(Point point)
         {
             WFCNode self = _indexer(point);
@@ -425,9 +454,19 @@ namespace Test
                     if (self.GetSocket(i) != 0) { score = -10f; }
                 }
 
-                if (other.GetTileType() == 1 && _random.Next(0,4) > 0) { score += .5f; }
-                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += .9f; }
+                // Make grass more than dirt
+                if (other.GetTileType() == 1 && _random.Next(0,4) > 0) { score += .6f; }
+                // Standard textures more than detail
+                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += .6f; }
+                // Less dirt details
+                if ((other.Name == "tile011" || other.Name == "tile012" || other.Name == "tile013") && _random.Next(0, 3) > 0) { score -= .1f; }
+                // Less grass stones
                 if ((other.Name == "tile018" || other.Name == "tile019" || other.Name == "tile020") && _random.Next(0, 6) > 0) { score -= .8f; }
+                // More grass in the grass
+                if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 6) > 4) { score += .5f; }
+
+                // If it's a 'emergency filler' tile
+                if (other.Name == "tile0204" || other.Name == "tile0205" || other.Name == "tile0206" || other.Name == "tile0207" || other.Name == "tile0208" || other.Name == "tile0209") { score -= 0.9f; }
 
                 if (_random.Next(0, 2) == 0)
                 {
@@ -438,7 +477,18 @@ namespace Test
                     if (score >= bestScore) { bestScore = (int)score; bestNode = other; }
                 }
             }
-            //if (bestNode == WFCNodes.Invalid) { Debug.WriteLine("No matching node found!"); }
+            /*
+            if (bestNode == WFCNodes.Invalid)
+            {
+                foreach (Point3 neighbor in GetNeighbors(point))
+                {
+                    Point neighborPos = new(neighbor.X, neighbor.Y);
+                    _indexer(neighborPos).Pack(-1, MirrorSocket(neighbor.Z));
+                    _indexer(neighborPos).Pack(-1, MirrorSocket(neighbor.Z + 1));
+                    AddToEntropyList(neighborPos, node.GetEntropy());
+                }
+            }
+            */
             //self.Print();
             return bestNode;
         }

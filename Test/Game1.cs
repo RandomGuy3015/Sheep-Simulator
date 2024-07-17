@@ -130,9 +130,6 @@ namespace Test
             var inputState = _inputManager.Update();
 
             _camera.Update(inputState, _graphics);
-            for (int i = 0; i < 10; i++) {
-                _waveFunctionCollapse.Collapse();
-            }
 
 
             base.Update(gameTime);
