@@ -339,7 +339,7 @@ namespace Test
             _lowestEntropyValue = 0;
 
             // _startPoint gets assigned all 2s in it's sockets
-            for (int i=0; i<2000; i++) { Collapse(); }
+            for (int i=0; i<10000; i++) { Collapse(); }
         }
 
         public void Collapse()
@@ -404,7 +404,8 @@ namespace Test
                     if (self.GetSocket(i) != 0) { score = -10; }
                 }
 
-                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 4) > 0) { score += 1; }
+                if ((other.Name == "tile003" || other.Name == "tile008") && _random.Next(0, 6) > 0) { score += 1; }
+                if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 2) > 0) { score += 1; }
 
                 if (_random.Next(0, 2) == 0)
                 {
