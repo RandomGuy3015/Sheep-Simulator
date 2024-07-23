@@ -1,12 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Test.DynamicContentManagement;
-using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
 using Test.InputMangement;
 
 namespace Test
@@ -44,8 +39,6 @@ namespace Test
 
         // -----------------------------------------   OTHER VARS   ------------------------------------------
 
-        private Sheep mSheep;
-        private Sheep mShaun;
         public static Dictionary<int, Item> ItemDict;
         public static Dictionary<int, Sheep> SheepDict;
         public static Dictionary<int, Sheep> SheepQueue;
@@ -206,7 +199,7 @@ namespace Test
             SheepCount = 2; // 2 objects spawned already
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            
             SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, true, 0.2f, 2000);
             SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, false, 0.45f, 2000);
         }

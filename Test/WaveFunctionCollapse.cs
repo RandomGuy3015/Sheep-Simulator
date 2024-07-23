@@ -161,6 +161,7 @@ namespace Test
 
         public void Pack(int value, int direction)
         {
+            /*
             if (direction == 0 && Left == 0) { Left = value; }
             else if (direction == 1 && TopLeft == 0) { TopLeft = value; }
             else if (direction == 2 && Top == 0) { Top = value; }
@@ -169,11 +170,41 @@ namespace Test
             else if (direction == 5 && BottomRight == 0) { BottomRight = value; }
             else if (direction == 6 && Bottom == 0) { Bottom = value; }
             else if (direction == 7 && BottomLeft == 0) { BottomLeft = value; }
+            */
+            switch (direction)
+            {
+                case 0:
+                    if (Left == 0) { Left = value; }
+                    break;
+                case 1:
+                    if (TopLeft == 0) { TopLeft = value; }
+                    break;
+                case 2:
+                    if (Top == 0) { Top = value; }
+                    break;
+                case 3:
+                    if (TopRight == 0) { TopRight = value; }
+                    break;
+                case 4:
+                    if (Right == 0) { Right = value; }
+                    break;
+                case 5:
+                    if (BottomRight == 0) { BottomRight = value; }
+                    break;
+                case 6:
+                    if (Bottom == 0) { Bottom = value; }
+                    break;
+                case 7:
+                    if (BottomLeft == 0) { BottomLeft = value; }
+                    break;
+            }
+
             //else { throw new Exception("Error"); }
         }
 
         public int GetSocket(int dir)
         {
+            /*
             if (dir == 0) { return Left; }
             if (dir == 1) { return TopLeft; }
             if (dir == 2) { return Top; }
@@ -182,7 +213,29 @@ namespace Test
             if (dir == 5) { return BottomRight; }
             if (dir == 6) { return Bottom; }
             if (dir == 7) { return BottomLeft; }
-            else { return -1; }
+            else { return -1; }*/
+            switch (dir)
+            {
+                case 0:
+                    return Left;
+                case 1:
+                    return TopLeft;
+                case 2:
+                    return Top;
+                case 3:
+                    return TopRight;
+                case 4:
+                    return Right;
+                case 5:
+                    return BottomRight;
+                case 6:
+                    return Bottom;
+                case 7:
+                    return BottomLeft;
+                default:
+                    return -1;
+            }
+            
         }
 
         public int GetEntropy()
