@@ -582,6 +582,22 @@ namespace Test
             }
         }
 
+        public void DrawToRenderTarget(SpriteBatch spriteBatch)
+        {
+            
+
+            spriteBatch.Begin();
+
+            foreach (Point point in Looper())
+            {
+                spriteBatch.Draw(ContentDictionary.TextureDict[_indexer(point).Name + ".png"], new Rectangle(point.X * 20, point.Y * 20, 20, 20), Color.White);
+            }
+
+            spriteBatch.End();
+
+            
+        }
+
         public IEnumerable<string> TextureExporter()
         {
             foreach (WFCNode node in WFCNodes.nodes)

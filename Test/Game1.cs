@@ -12,7 +12,6 @@ namespace Test
 
 
         // -----------------------------------------   GRID VARS   -------------------------------------------
-
         private Grid _grid;
         private Grid _WFCGrid;
 
@@ -44,6 +43,7 @@ namespace Test
         public static Dictionary<int, Sheep> SheepQueue;
         public static int ItemCount;
         public static int SheepCount;
+        private RenderTarget2D bgRenderTarget;
 
 
         // ########################################   CONSTRUCTOR   ###########################################
@@ -70,7 +70,7 @@ namespace Test
             _grid = new(_size, _gridSquareSize, new Vector2(0, 0));
             _WFCGrid = new(_size, _gridSquareSize, Vector2.Zero);
 
-
+            
             // -------------------------------------   MANAGERS   -----------------------------------------------
 
             SoundManager = new();
@@ -84,7 +84,10 @@ namespace Test
                 DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
             _camera = new(_graphics, _inputManager);
 
+            // -----------------------------------   BackGround Rendering  --------------------------------------
 
+            bgRenderTarget = new RenderTarget2D(GraphicsDevice, 2000, 2000);
+           
 
             base.Initialize();
         }
@@ -138,17 +141,40 @@ namespace Test
         {
 
             // ######################################   DRAW INIT   ##############################################
-
-            GraphicsDevice.SetRenderTarget(_renderTarget);
+            /*
+            count++;
+            GraphicsDevice.SetRenderTarget(bgRenderTarget);
             GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
             GraphicsDevice.Clear(Color.Transparent);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
 
+            if (!bgRenderBool)
+            {
+                _waveFunctionCollapse.Draw(_spriteBatch);
+                 //bgRenderBool = true;
+            }
+            
+            _spriteBatch.End();
+            */
+            
+
+            GraphicsDevice.SetRenderTarget(_renderTarget);
+            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            GraphicsDevice.Clear(Color.Transparent);
+
+
+            // Draws prerendered BackGround
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+            _spriteBatch.Draw(bgRenderTarget, Vector2.Zero, Color.White);
+            _spriteBatch.End();
+
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.Transform);
+
             //_grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
             //_grid.DrawGrid(_spriteBatch);
-            _waveFunctionCollapse.Draw(_spriteBatch);
-          
+
+
             // IMPORTANT POOP DRAW
             foreach (Item item in ItemDict.Values)
             {
@@ -200,8 +226,23 @@ namespace Test
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
+
+
             SheepDict[0] = new Sheep(new Vector2(1000, 1000), "sheep.png", 0, 2f, true, 0.2f, 2000);
             SheepDict[1] = new Sheep(new Vector2(1000, 1000), "shaun.png", 1, 2f, false, 0.45f, 2000);
+
+
+
+            // rendering of BACKGROUND 
+            GraphicsDevice.SetRenderTarget(bgRenderTarget);
+            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            GraphicsDevice.Clear(Color.Transparent);
+
+            _spriteBatch.Begin();
+
+            _waveFunctionCollapse.Draw(_spriteBatch);
+   
+            _spriteBatch.End();
         }
 
         private List<string> ContentList()
