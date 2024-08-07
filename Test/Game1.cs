@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Linq;
 using Test.InputMangement;
 
 namespace Test
@@ -18,8 +19,7 @@ namespace Test
 
         // -----------------------------------------   MANAGERS   --------------------------------------------
 
-        private WaveFunctionCollapse _waveFunctionCollapse;
-        private WaveFunctionCollapse _waveFunctionCollapse2;
+        private WFCManager _WFCManager;
         private Pathfinder _pathFinder;
         private InputManager _inputManager;
         public static SoundManager SoundManager;
@@ -70,8 +70,6 @@ namespace Test
             // ------------------------------------   GRID VARS   ------------------------------------------------
 
             _grid = new(_size, _gridSquareSize, new Vector2(0, 0));
-            _WFCGrid = new(_size, _gridSquareSize, Vector2.Zero);
-            _WFCGrid2 = new(_size, _gridSquareSize, Vector2.Zero);
 
             
             // -------------------------------------   MANAGERS   -----------------------------------------------
@@ -79,8 +77,7 @@ namespace Test
             SoundManager = new();
             _pathFinder = new(_grid);
             _inputManager = new(new());
-            _waveFunctionCollapse = new(_WFCGrid, _WFCGrid.IsPathable, () => new Point((int)_size.X, (int)_size.Y), _WFCGrid.GetNode, _WFCGrid.SetNode, false);
-            _waveFunctionCollapse2 = new(_WFCGrid2, _WFCGrid2.IsPathable, () => new Point((int)_size.X, (int)_size.Y), _WFCGrid2.GetNode, _WFCGrid2.SetNode, true);
+            _WFCManager = new(_size, _gridSquareSize);
 
             // -----------------------------------   MONOGAME VARS   --------------------------------------------
 
@@ -178,7 +175,7 @@ namespace Test
             //_grid.DrawGridSquares(_spriteBatch, _gridSquareSize);
             //_grid.DrawGrid(_spriteBatch);
             //_waveFunctionCollapse.Draw(_spriteBatch);
-            _waveFunctionCollapse2.Draw(_spriteBatch);
+            //_waveFunctionCollapse2.Draw(_spriteBatch);
             // IMPORTANT POOP DRAW
             foreach (Item item in ItemDict.Values)
             {
@@ -244,7 +241,7 @@ namespace Test
 
             _spriteBatch.Begin();
 
-            _waveFunctionCollapse.Draw(_spriteBatch);
+            _WFCManager.Draw(_spriteBatch);
    
             _spriteBatch.End();
         }
@@ -265,14 +262,7 @@ namespace Test
             };
 
             // WFC Tiles
-            foreach (string tile in _waveFunctionCollapse.TextureExporter())
-            {
-                contentStringList.Add(tile + ".png");
-            }
-            foreach (string tile in _waveFunctionCollapse2.TextureExporter())
-            {
-                contentStringList.Add(tile + ".png");
-            }
+            contentStringList.AddRange(_WFCManager.TextureExporter());
 
             return contentStringList;
         }
