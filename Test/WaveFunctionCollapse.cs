@@ -336,6 +336,31 @@ namespace Test
             new WFCNode(2, 1, 1, 2, 2, 1, 1, 2, "tile0208"),
             new WFCNode(2, 2, 2, 1, 1, 2, 2, 1, "tile0209"),
         };
+        public static List<WFCNode> nodes2 = new()
+        {
+            new WFCNode(1, 1, 1, 2, 2, 3, 3, 3, "tile0210"),
+            new WFCNode(3, 2, 2, 1, 1, 1, 3, 3, "tile0211"),
+            new WFCNode(2, 2, 2, 2, 2, 2, 2, 2, "tile0212"),
+            new WFCNode(3, 2, 2, 2, 2, 3, 3, 3, "tile0228"),
+            new WFCNode(1, 1, 1, 2, 2, 2, 2, 1, "tile0213"),
+            new WFCNode(2, 2, 2, 1, 1, 1, 1, 2, "tile0214"),
+            new WFCNode(4, 4, 1, 2, 2, 2, 2, 1, "tile0215"),
+            new WFCNode(2, 2, 2, 1, 4, 4, 1, 2, "tile0216"),
+            new WFCNode(1, 1, 1, 1, 4, 4, 1, 2, "tile0217"),
+            new WFCNode(4, 4, 1, 1, 1, 1, 2, 1, "tile0218"),
+            new WFCNode(4, 4, 4, 4, 1, 1, 2, 1, "tile0219"),
+            new WFCNode(1, 1, 4, 4, 4, 4, 1, 2, "tile0220"),
+            new WFCNode(4, 4, 1, 1, 1, 1, 1, 1, "tile0221"),
+            new WFCNode(1, 1, 1, 1, 4, 4, 1, 1, "tile0222"),
+            new WFCNode(4, 4, 4, 4, 4, 4, 1, 1, "tile0223"),
+            new WFCNode(4, 4, 4, 4, 4, 4, 1, 1, "tile0224"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 4, 4, "tile0225"),
+            new WFCNode(4, 4, 4, 4, 1, 1, 4, 4, "tile0226"),
+            new WFCNode(1, 1, 4, 4, 4, 4, 4, 4, "tile0227"),
+            new WFCNode(1, 1, 1, 1, 1, 1, 1, 1, "tile0229"),
+            new WFCNode(1, 1, 3, 3, 1, 1, 1, 1, "tile0230"),
+
+        };
 
         public static WFCNode Uncollapsed = nodes[0];
         public static WFCNode Invalid = nodes[2];
@@ -365,7 +390,7 @@ namespace Test
 
         private Point _startPoint;
 
-
+        private bool _isDecoGrid;
 
         readonly private Random _random;
 
@@ -378,7 +403,7 @@ namespace Test
         /// <param name="isGridSquareCollapsable">A function defining if the grid square at an index is collapsable, or if it should be seen as a void.</param>
         /// <param name="getSize">This gets the size of the grid. It's important this is a function, not an int, that way if the size changes it gets updated here.</param>
         /// <param name="socketsPerGridSquare">The sockets each Grid Square has, either 4 (up, down, right, left) or 8 (diagonals too).</param>
-        public WaveFunctionCollapse(Grid grid, Func<Point, bool> isGridSquareCollapsable, Func<Point> getSize, Func<Point, WFCNode> indexer, Func<Point, WFCNode, bool, bool> setter, int socketsPerGridSquare = 8, int socketTypes = 8)
+        public WaveFunctionCollapse(Grid grid, Func<Point, bool> isGridSquareCollapsable, Func<Point> getSize, Func<Point, WFCNode> indexer, Func<Point, WFCNode, bool, bool> setter, bool isDecoGrid, int socketsPerGridSquare = 8, int socketTypes = 8)
         {
             _grid = grid;
             _isGridSquareCollapsable = isGridSquareCollapsable;
@@ -386,6 +411,7 @@ namespace Test
             _indexer = indexer;
             _setter = setter;
             _WFCNodeType = Convert.ToBoolean((socketsPerGridSquare / 4) - 1);
+            _isDecoGrid = isDecoGrid;
 
             _random = new ();
             _entropy  = new Dictionary<int, List<Point>>();
@@ -396,6 +422,8 @@ namespace Test
 
         private void Initialize()
         {
+            WFCNode startNode;
+
             foreach (Point point in Looper())
             {
                 WFCNode node = new (_WFCNodeType);
@@ -403,31 +431,43 @@ namespace Test
                 _grid.SetPathable(point, true);
             }
 
-            _startPoint = new Point(_getSize().X - 1, _getSize().Y - 1);
 
-            for (int i = 0; i<9; i++)
+
+            if (_isDecoGrid)
             {
-                _entropy.Add(i, new List<Point>());
+                for (int i = 0; i < 9; i++)
+                {
+                    _entropy.Add(i, new List<Point>());
+                }
+
+                for (int j = 0; j < 100; j++)
+                {
+                    _startPoint = new Point(_random.Next(0, _getSize().X - 1), _random.Next(_getSize().Y - 1));
+                    startNode = _indexer(_startPoint);
+
+                    _setter(_startPoint, WFCNodes.nodes2[0], false);
+                    _entropy[8].Add(_startPoint);
+                }
+
             }
-
-            /*
-            int x = 0;
-            while (!_isGridSquareCollapsable(_startPoint))
+            else
             {
-                _startPoint = new Point(_random.Next(0, _getSize().X), _random.Next(0, _getSize().Y));
-                x++;
+                _startPoint = new Point(_getSize().X - 1, _getSize().Y - 1);
 
-                if (x > 1000) { throw new Exception("ouch"); }
-            
-            */
+                for (int i = 0; i < 9; i++)
+                {
+                    _entropy.Add(i, new List<Point>());
+                }
 
-            WFCNode startNode = _indexer(_startPoint);
+                startNode = _indexer(_startPoint);
 
-            for (int i = 0; i < 8; i++)
-            {
-                startNode.Pack(2, i);
+                for (int i = 0; i < 8; i++)
+                {
+                    startNode.Pack(2, i);
+                }
+                _entropy[8].Add(_startPoint);
+
             }
-            _entropy[8].Add(_startPoint);
 
             while (Collapse()) { }
         }
@@ -497,7 +537,7 @@ namespace Test
             float bestScore = 0f;
             WFCNode bestNode = WFCNodes.Invalid;
 
-            foreach (WFCNode other in WFCNodes.nodes)
+            foreach (WFCNode other in Nodes())
             {
                 float score = -1f;
 
@@ -518,6 +558,16 @@ namespace Test
                 // More grass in the grass
                 if ((other.Name == "tile004" || other.Name == "tile005" || other.Name == "tile006") && _random.Next(0, 6) > 4) { score += .5f; }
 
+                // More leafy trees
+                if ((other.Name == "tile0225" || other.Name == "tile0221" || other.Name == "tile0222") && _random.Next(0, 7) > 5) { score += .5f; }
+                // Less weird branches
+                if ((other.Name == "tile0224" || other.Name == "tile0223" || other.Name == "tile0226" || other.Name == "tile0227") && _random.Next(0, 7) > 1) { score -= .4f; }
+
+                // trees that end
+                if ((other.Name == "tile0229")) { score += 1.5f; }
+
+
+
                 // If it's a 'emergency filler' tile
                 if (other.Name == "tile0204" || other.Name == "tile0205" || other.Name == "tile0206" || other.Name == "tile0207" || other.Name == "tile0208" || other.Name == "tile0209") { score -= 0.9f; }
 
@@ -527,21 +577,26 @@ namespace Test
                 }
                 else
                 {
+
+                }
+                {
                     if (score >= bestScore) { bestScore = (int)score; bestNode = other; }
                 }
             }
+            
+            
             /*
-            if (bestNode == WFCNodes.Invalid)
             {
                 foreach (Point3 neighbor in GetNeighbors(point))
                 {
                     Point neighborPos = new(neighbor.X, neighbor.Y);
                     _indexer(neighborPos).Pack(-1, MirrorSocket(neighbor.Z));
                     _indexer(neighborPos).Pack(-1, MirrorSocket(neighbor.Z + 1));
-                    AddToEntropyList(neighborPos, node.GetEntropy());
+                    AddToEntropyList(neighborPos, _indexer(neighborPos).GetEntropy());
                 }
             }
             */
+            
             //self.Print();
             return bestNode;
         }
@@ -557,6 +612,7 @@ namespace Test
         {
             return socket % 2 == 0 ? (socket + 5) % 8 : (socket + 3) % 8;
         }
+
         /// <summary>
         /// This creates a short-hand way of accessing each point in the grid.
         /// </summary>
@@ -582,25 +638,21 @@ namespace Test
             }
         }
 
-        public void DrawToRenderTarget(SpriteBatch spriteBatch)
+        public IEnumerable<WFCNode> Nodes()
         {
-            
-
-            spriteBatch.Begin();
-
-            foreach (Point point in Looper())
+            if (_isDecoGrid)
             {
-                spriteBatch.Draw(ContentDictionary.TextureDict[_indexer(point).Name + ".png"], new Rectangle(point.X * 20, point.Y * 20, 20, 20), Color.White);
+                return WFCNodes.nodes2;
             }
-
-            spriteBatch.End();
-
-            
+            else
+            {
+                return WFCNodes.nodes;
+            }
         }
 
         public IEnumerable<string> TextureExporter()
         {
-            foreach (WFCNode node in WFCNodes.nodes)
+            foreach (WFCNode node in Nodes())
             {
                 yield return node.Name;
             }
